@@ -1,0 +1,30 @@
+jobs:
+- job: release
+  variables:
+    imageName: glaux/locksmith-build-deps
+  pool:
+    vmImage: 'ubuntu-16.04'
+  strategy:
+    matrix:
+      xenial:
+        ubuntuRelease: '16.04'
+      bionic:
+        ubuntuRelease: '18.04'
+  steps:
+    - script: sed 's/{{ubuntu_release}}/$(ubuntuRelease)/g' Dockerfile.template > Dockerfile
+      displayName: Render Dockerfile
+    - task: Docker@1
+      displayName: Build image
+      inputs:
+        command: build
+        containerregistrytype: Container Registry
+        dockerRegistryEndpoint: glaux-registry
+        dockerFile: Dockerfile
+        imageName: $(imageName):$(ubuntuRelease)
+    - task: Docker@1
+      displayName: Push image
+      inputs:
+        command: push
+        containerregistrytype: Container Registry
+        dockerRegistryEndpoint: glaux-registry
+        imageName: $(imageName):$(ubuntuRelease)

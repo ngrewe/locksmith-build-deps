@@ -1,0 +1,4 @@
+FROM ubuntu:{{ubuntu_release}}
+RUN apt-get update && apt-get install -qy --no-install-recommends \ 
+  build-essential golang-any dh-systemd debhelper && \
+  useradd -m -u 1001 vsts_azpcontainer
